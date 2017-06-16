@@ -1,5 +1,7 @@
 # Regression Plot
 
+![preview](https://raw.github.com/fkabinoff/qs-regressionplot/master/preview.png)
+
 Qlik Sense extension - Scatterplot for regression analysis.
 
 ## How to use
