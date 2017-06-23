@@ -55,8 +55,8 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 										type: "integer",
 										label: "Order",
 										ref: "regression.order",
-										min: "2",
-										defaultValue: "2",
+										min: 2,
+										defaultValue: 2,
 										show: function(layout) {
 											return layout.regression.type === "polynomial";
 										}
@@ -107,6 +107,7 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 				exportData: true
 			},
 			paint: function ($element, layout) {
+				console.log($element);
 				// get points on regression line
 				var regressionPoints = this.$scope.generateRegressionPoints();
 
@@ -114,10 +115,10 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 				var width = $element.width() - layout.margin.left - layout.margin.right;
 				var height = $element.height() - layout.margin.top - layout.margin.bottom;
 				
-				d3.select("svg")
+				d3.select($element[0]).select("svg")
 					.attr("width", $element.width())
 					.attr("height", $element.height());
-				d3.select(".plot")
+				d3.select($element[0]).select(".plot")
 					.attr("transform", "translate(" + layout.margin.left + "," + layout.margin.top + ")");
 				
 				// scales
@@ -129,14 +130,14 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 					.range([height, 0]);
 
 				// x and y axis
-				d3.select(".x-axis")
+				d3.select($element[0]).select(".x-axis")
 					.attr("transform", "translate(0," + height + ")")
 					.call(d3.axisBottom(x).tickSizeOuter(0));
-				d3.select(".y-axis")
+				d3.select($element[0]).select(".y-axis")
 					.call(d3.axisLeft(y).tickSizeOuter(0));
 
 				/////// DOTS //////
-				var dots = d3.select(".plot").selectAll(".dot")
+				var dots = d3.select($element[0]).select(".plot").selectAll(".dot")
 					.data(layout.qHyperCube.qDataPages[0].qMatrix);
 				//enter
 				dots.enter().append("circle")
@@ -157,7 +158,7 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 					.attr("cy", function(d) { return y(d[2].qNum); });
 
 				//// REGRESSION LINE ////
-				var regressionLine = d3.select(".plot").selectAll(".regression")
+				var regressionLine = d3.select($element[0]).select(".plot").selectAll(".regression")
 					.data([regressionPoints]);
 				//enter
 				regressionLine.enter().append("path")
@@ -173,7 +174,7 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 					.attr("d", d3.line().curve(d3.curveCardinal).x(function(d){ return x(d[0]); }).y(function(d){ return y(d[1]); }));
 
 				//// STATS ////
-				d3.select(".plot").selectAll(".r-squared")
+				d3.select($element[0]).select(".plot").selectAll(".r-squared")
 					.data([this.$scope.regression])
 					.attr("x", width)
 					.attr("y", height - 2)
@@ -184,7 +185,7 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 					.attr("x", width)
 					.attr("y", height - 2)
 					.text("R-Squared: " + this.$scope.regression.r2);
-				d3.select(".plot").selectAll(".equation")
+				d3.select($element[0]).select(".plot").selectAll(".equation")
 					.data([this.$scope.regression])
 					.attr("x", width)
 					.attr("y", height - 20)
@@ -202,6 +203,7 @@ define( ["qlik", "https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js", ".
 			controller: ["$scope", "$element", function ( $scope, $element ) {
 				//recalculate regression when user changes regression type
 				$scope.$watch("layout.regression", function() {
+					console.log($scope.layout.regression.order);
 					$scope.regression = regression($scope.layout.regression.type, $scope.layout.qHyperCube.qDataPages[0].qMatrix.map(function(row){return [row[1].qNum,row[2].qNum]}), $scope.layout.regression.order);
 				}, true);
 
